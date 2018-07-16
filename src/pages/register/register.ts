@@ -1,5 +1,9 @@
-import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { Component, ViewChild } from '@angular/core';
+import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
+import {LoginPage} from '../login/login';
+
+import { AngularFireAuth } from 'angularfire2/auth';
+
 
 /**
  * Generated class for the RegisterPage page.
@@ -15,11 +19,38 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 })
 export class RegisterPage {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  @ViewChild('fullname') fullname;
+  @ViewChild('username') uname;
+  @ViewChild('password') pword;
+  @ViewChild('confirmpassword') confirmpassword;
+
+  constructor(private fire:AngularFireAuth,public navCtrl: NavController, public navParams: NavParams, public alertCtrl:AlertController) {
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad RegisterPage');
+  }
+
+  alert(message: string) {
+    this.alertCtrl.create({
+      title: "Information", 
+      subTitle: message,
+      buttons: ["OK"]
+    }).present();
+  }
+
+  registerUser(){ 
+    this.fire.auth.createUserWithEmailAndPassword(this.uname.value,this.pword.value)
+    .then(data=>{
+      console.log("got data", data);
+      this.alert("User Successfully Registered !");
+      this.navCtrl.setRoot(LoginPage);
+    })
+    .catch(error=>{
+      console.log("got an error", error);
+      this.alert(error.message);
+    });
+    console.log("clicked register");
   }
 
 }
